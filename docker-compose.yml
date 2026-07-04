@@ -1,0 +1,79 @@
+services:
+  sonarqube:
+    image: ${SONARQUBE_IMAGE}
+    container_name: sonarqube
+    hostname: sonarqube
+    environment:
+      # --- Harici veritabanı (bu Compose DB servisi çalıştırmaz) ---
+      SONAR_JDBC_URL: ${SONAR_JDBC_URL}
+      SONAR_JDBC_USERNAME: ${SONAR_JDBC_USERNAME}
+      SONAR_JDBC_PASSWORD: ${SONAR_JDBC_PASSWORD}
+
+      # --- Web Sunucu ---
+      SONAR_WEB_HOST: ${SONAR_WEB_HOST}
+      SONAR_WEB_PORT: ${SONAR_WEB_PORT}
+      SONAR_WEB_CONTEXT: ${SONAR_WEB_CONTEXT}
+
+      # --- JVM Heap Ayarları (8 CPU / 16 GB RAM için optimize) ---
+      # ES  : 4g  — Lucene off-heap için kalan RAM'e ihtiyaç duyar, 50%'yi geçme
+      # Web : 2g  — HTTP + plugin yükleme için yeterli
+      # CE  : 4g  — Analiz işleme; büyük projede bu değer kritik
+      # Toplam heap: 10g | OS + Lucene + Docker overhead için 6g serbest kalır
+      SONAR_SEARCH_JAVAOPTS: "-Xmx4g -Xms4g"
+      SONAR_WEB_JAVAOPTS: "-Xmx2g -Xms2g"
+      SONAR_CE_JAVAOPTS: "-Xmx4g -Xms4g"
+
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+      # SonarQube instance ayarları
+      - ./config/sonar.properties:/opt/sonarqube/conf/sonar.properties:ro,Z
+
+    ports:
+      - "${SONAR_BIND_ADDRESS:-0.0.0.0}:${SONAR_HOST_PORT:-9000}:9000"
+
+    # External DB sunucusu hostname çözümlemesi için (DNS yoksa)
+    # extra_hosts:
+    #   - "db-server.sirket.com:10.0.0.50"
+
+    networks:
+      - sonarqube_net
+
+    restart: unless-stopped
+
+    deploy:
+      resources:
+        limits:
+          cpus: "8"
+          memory: 13g        # heap(10g) + off-heap + metaspace için güvenli tavan
+        reservations:
+          cpus: "2"
+          memory: 10g
+
+    ulimits:
+      nofile:
+        soft: 131072
+        hard: 131072
+      nproc:
+        soft: 8192
+        hard: 8192
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9000/api/system/status | grep -q '\"status\":\"UP\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 180s
+
+volumes:
+  sonarqube_data:
+    driver: local
+  sonarqube_extensions:
+    driver: local
+  sonarqube_logs:
+    driver: local
+networks:
+  sonarqube_net:
+    driver: bridge
+    name: sonarqube_net
