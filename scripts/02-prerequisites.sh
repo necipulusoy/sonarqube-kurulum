@@ -15,9 +15,12 @@ command -v docker >/dev/null || error "Docker Engine kurulu değil. Müşteri i�
 docker compose version >/dev/null 2>&1 || error "Docker Compose V2 plugin kurulu değil."
 docker info >/dev/null 2>&1 || error "Docker daemon çalışmıyor veya kullanıcı Docker'a erişemiyor."
 command -v curl >/dev/null || error "curl kurulu değil."
+command -v git >/dev/null || error "git kurulu değil. Offline bundle yeniden hazırlanmalıdır."
+command -v ssh >/dev/null || error "OpenSSH istemcisi kurulu değil. Offline bundle yeniden hazırlanmalıdır."
 
 info "Docker: $(docker --version)"
 info "Compose: $(docker compose version)"
+info "Git: $(git --version)"
 info "vm.max_map_count: $(sysctl -n vm.max_map_count 2>/dev/null || echo bilinmiyor)"
 info "Ön kontroller tamamlandı. Bu script internetten paket veya binary indirmez."
 info "Sonraki adım: sudo bash scripts/03-configure-system.sh"

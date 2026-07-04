@@ -37,6 +37,8 @@ dnf install -y \
 systemctl enable --now docker
 docker --version
 docker compose version
+git --version
+ssh -V
 docker info >/dev/null
 
 if [[ -n "${SUDO_USER:-}" && "${SUDO_USER}" != "root" ]]; then

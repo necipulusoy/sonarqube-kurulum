@@ -1,0 +1,7 @@
+.env
+env
+.env.ec2
+test/mssql/.env
+backups/
+.DS_Store
+test-results/

@@ -1,6 +1,6 @@
 #!/bin/bash
 # İnternet erişimli RHEL 9 x86_64 makinede çalıştırılır.
-# Docker Engine ve Compose V2 RPM'lerini doğrudan bu repo altındaki packages/ dizinine indirir.
+# Docker Engine, Compose V2, Git ve OpenSSH RPM'lerini packages/ dizinine indirir.
 set -euo pipefail
 
 info()  { printf '[INFO] %s\n' "$*"; }
@@ -30,7 +30,7 @@ fi
 mkdir -p "$RPM_DIR"
 find "$RPM_DIR" -maxdepth 1 -type f -name '*.rpm' -delete
 
-info "Docker Engine, Compose V2 ve tüm RPM bağımlılıkları indiriliyor..."
+info "Docker Engine, Compose V2, Git/SSH ve tüm RPM bağımlılıkları indiriliyor..."
 dnf download \
   --resolve \
   --alldeps \
@@ -39,7 +39,9 @@ dnf download \
   docker-ce-cli \
   containerd.io \
   docker-buildx-plugin \
-  docker-compose-plugin
+  docker-compose-plugin \
+  git \
+  openssh-clients
 
 info "Docker repository GPG anahtarı indiriliyor..."
 curl --fail --silent --show-error --location \

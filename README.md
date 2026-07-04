@@ -112,7 +112,7 @@ cd sonarqube-kurulum
 sudo bash scripts/00-prepare-offline-packages.sh
 ```
 
-Script her zaman clone edilen reponun kök dizini altında aşağıdaki yapıyı oluşturur; başka bir dizine elle taşımanız gerekmez:
+Script Docker Engine, Compose V2, Git, OpenSSH istemcisi ve bunların RPM bağımlılıklarını indirir. Her zaman clone edilen reponun kök dizini altında aşağıdaki yapıyı oluşturur; başka bir dizine elle taşımanız gerekmez:
 
 ```text
 sonarqube-kurulum/
@@ -126,6 +126,8 @@ sonarqube-kurulum/
         ├── docker-ce-cli-....rpm
         ├── docker-buildx-plugin-....rpm
         ├── docker-compose-plugin-....rpm
+        ├── git-....rpm
+        ├── openssh-clients-....rpm
         └── diğer-bağımlılıklar.rpm
 ```
 
@@ -190,6 +192,8 @@ bash scripts/02-prerequisites.sh
 Başarılı sonuçta Docker ve Compose sürümleri ekrana yazılır. Hata varsa sonraki adıma geçmeyin.
 
 Kurulum scripti önce `packages/SHA256SUMS` ile bütünlük doğrulaması yapar, ardından yalnızca `packages/rhel9-x86_64/` içindeki RPM'leri `--disablerepo='*'` ile kurar. İnternete veya harici paket repository'sine gitmez.
+
+Kurulum sonrasında `git --version` ve `ssh -V` komutları da doğrulanır. Böylece air-gap sunucu kurum içi Git sunucusuna HTTPS veya SSH ile erişebiliyorsa sonraki güncellemeler `git pull` ile alınabilir. Repo arşivle taşınacaksa Git zorunlu değildir, ancak bakım kolaylığı için bundle'a dahil edilmiştir.
 
 ## 4. Image'ın Nexus'a Hazırlanması
 
