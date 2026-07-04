@@ -1,0 +1,4 @@
+Hazırlama tarihi: 2026-07-04T20:06:55+00:00
+Hazırlayan sistem: Red Hat Enterprise Linux 9.8 (Plow)
+Mimari: x86_64
+RPM sayısı: 205
